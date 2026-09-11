@@ -25,9 +25,6 @@ services:
     image: ghcr.io/open-webui/mcpo:main
     container_name: mcpo-proxy
     restart: unless-stopped
-    depends_on:
-      mcp-openstack:
-        condition: service_healthy
     ports:
        - "${DOCKER_EXTERNAL_PORT_MCPO_PROXY}:8000"
     volumes:

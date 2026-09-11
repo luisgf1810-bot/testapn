@@ -1,0 +1,73 @@
+You are a devops engineer. We need to create a script to configure APNs inside Huawei 5G equipment.
+
+The new script has to be created using the following values for each variable. 
+
+The following lisr hast the format of name of the variable, followed by a : and then its value.
+
+nombre_VPN : Mayhem
+ID : 12345
+AS : 0001
+nombre_POOL : pool1
+inicio_POOL : 12
+fin_POOL : 23
+nombre_APN : vykernes
+DNS_server : 10.0.0.1
+GY_hostname : pool-gy.movistar
+user_name : euronymus
+RDS_server : 127.0.0.1
+
+
+Use the following example script to generate the new one with the replaced values of the variables listed above.
+
+
+
+## Configuración VPN ## 
+En VNRS
+
+ADD L3VPNINST:VRFNAME=" nombre_VPN ";
+ADD VPNINSTAF: VRFNAME=" nombre_VPN ", AFTYPE=ipv4uni, VRFRD="22185: ID", VRFLABELMODE=perInstance; 
+
+ADD VPNTARGET:VRFNAME=" nombre_VPN ",AFTYPE=ipv4uni,VRFRTTYPE=export_extcommunity,VRFRTVALUE=“ AS:ID ";
+ADD VPNTARGET:VRFNAME=" nombre_VPN ",AFTYPE=ipv4uni,VRFRTTYPE=import_extcommunity,VRFRTVALUE=“ AS:ID ";
+
+ADD BGPVRF: VRFNAME=" nombre_VPN ", DEFAULTAFTYPE=noaf; 
+ADD BGPVRFAF: VRFNAME=" nombre_VPN ", AFTYPE=ipv4uni, MAXIMUMLOADBALANCE=2; 
+
+ADD IMPORTROUTE: VRFNAME=" nombre_VPN ", AFTYPE=ipv4uni, IMPORTPROTOCOL=wlr;
+
+En UGW
+ADD VPNINST:VPNINSTANCE=" nombre_VPN ";
+ADD POOL:POOLNAME=" nombre_POOL ",POOLTYPE=LOCAL, IPLEASE=DISABLE,HASVPN=ENABLE,VPNINSTANCE=" nombre_VPN ";
+ADD SECTION:POOLNAME=" nombre_POOL ",SECTIONNUM=0,IPVERSION=IPV4,V4STARTIP=" inicio_POOL ",V4ENDIP=" fin_POOL ";
+
+## Configuración APN ## 
+En UGW
+ADD APN:APN=" nombre_APN ",VIRTUALAPN=DISABLE,HASVPN=ENABLE,VPNINSTANCE=" nombre_VPN ",HASVPNIPV6=DISABLE,SERVINGNODEPLMN=ENABLE,SERVINGNODERAT=ENABLE;
+
+ADD POOLBINDAPN:APN=" nombre_APN ",POOLNAME=" nombre_POOL ";
+SET APNDNS:APN=" nombre_APN ",MDNSSERVERV4=" DNS_server ",BDNSSERVERV4=" DNS_server ";
+ADD REALMBINDAPN:APN=" nombre_APN ",APPLICATION=GY,CONSTBYIMSISW=DISABLE,REALMNAME=" GY_hostname ";
+
+SET APNCHARGECTRL:APN=" nombre_APN ",ONLINESW=ENABLE,OFFLINESW=ENABLE,TIGHTINTERWORK=INHERIT,TARIFFGRPNAME="test",CCNAME="test";
+ADD APNUSRPROFG:APN=" nombre_APN ",USERPROFGNAME=" user_name ";
+
+ADD APNRDSSVRGRP:APN=" nombre_APN ",RDSSVRGRPNAME=" RDS_server ",COPYINTERIMUPD=DISABLE;
+SET APNRDSACCTCTRL:APN=" nombre_APN ",SUPPORTACCTRSP=DISABLE,DEACTIVE=CONTINUE,SUPPORTACCTSTOP=DISABLE,SUPPORTACCTUPD=ENABLE;
+
+
+
+The folowing are the list of variables of the script example that must be replaced.
+
+nombre_VPN
+ID 
+AS 
+nombre_POOL
+inicio_POOL
+fin_POOL
+nombre_APN
+DNS_server
+GY_hostname
+user_name
+RDS_server
+
+
